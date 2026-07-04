@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aerial Object Detection System</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+
+  <div class="scanline"></div>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand">
+        <span class="brand-mark">AOD</span>
+        <span class="brand-sub">v8</span>
+      </div>
+      <div class="header-status" id="modelStatus">
+        <span class="status-dot"></span>
+        <span class="status-text">Checking model&hellip;</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+
+    <section class="hero">
+      <p class="eyebrow">YOLOv8 &middot; Real-time Inference</p>
+      <h1>Aerial Object Detection System</h1>
+      <p class="subtitle">Detect AirPlane, Drone and Helicopter using a trained YOLOv8 model.</p>
+      <div class="class-chips">
+        <span class="chip chip-airplane"><i></i>AirPlane</span>
+        <span class="chip chip-drone"><i></i>Drone</span>
+        <span class="chip chip-helicopter"><i></i>Helicopter</span>
+      </div>
+    </section>
+
+    <section class="upload-card" id="uploadCard">
+      <div class="dropzone" id="dropzone">
+        <input type="file" id="fileInput" accept="image/png, image/jpeg, image/webp, image/bmp" hidden />
+
+        <div class="dropzone-content" id="dropzoneContent">
+          <svg class="upload-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 16V4M12 4L7 9M12 4L17 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4 16V18C4 19.1 4.9 20 6 20H18C19.1 20 20 19.1 20 18V16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <p class="dropzone-title">Drop an image here, or <span class="link-text">browse</span></p>
+          <p class="dropzone-hint">JPG, PNG, WEBP or BMP &middot; up to 16&nbsp;MB</p>
+        </div>
+
+        <div class="preview-content hidden" id="previewContent">
+          <img id="previewImage" alt="Selected image preview" />
+        </div>
+      </div>
+
+      <div class="upload-actions">
+        <button class="btn btn-primary" id="predictBtn" disabled>
+          <span class="btn-label">Run Detection</span>
+          <span class="spinner hidden" id="btnSpinner"></span>
+        </button>
+        <button class="btn btn-ghost" id="clearBtn" disabled>Clear</button>
+      </div>
+
+      <p class="error-msg hidden" id="errorMsg"></p>
+    </section>
+
+    <section class="results hidden" id="resultsSection">
+
+      <div class="results-grid">
+        <div class="image-panel">
+          <p class="panel-label">Original</p>
+          <div class="image-frame">
+            <img id="originalImage" alt="Original uploaded image" />
+          </div>
+        </div>
+        <div class="image-panel">
+          <p class="panel-label">Detected</p>
+          <div class="image-frame">
+            <img id="resultImage" alt="Annotated detection result" />
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat">
+          <span class="stat-value" id="statCount">0</span>
+          <span class="stat-label">Objects detected</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value" id="statTime">0 ms</span>
+          <span class="stat-label">Inference time</span>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="detections-table" id="detectionsTable">
+          <thead>
+            <tr>
+              <th>Class</th>
+              <th>Confidence</th>
+            </tr>
+          </thead>
+          <tbody id="detectionsBody">
+          </tbody>
+        </table>
+        <p class="no-detections hidden" id="noDetections">No objects detected above the confidence threshold.</p>
+      </div>
+
+      <div class="results-actions">
+        <a class="btn btn-primary" id="downloadBtn" download>Download Result</a>
+        <button class="btn btn-ghost" id="newImageBtn">Try Another Image</button>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <p>Aerial Object Detection System &middot; Powered by YOLOv8</p>
+  </footer>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
