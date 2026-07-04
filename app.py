@@ -13,10 +13,19 @@ import time
 import uuid
 import traceback
 
+# Must be set before torch is imported to take effect.
+os.environ.setdefault("OMP_NUM_THREADS", "1")
+
 from flask import Flask, request, jsonify, render_template, send_from_directory
 from werkzeug.utils import secure_filename
 from PIL import Image, UnidentifiedImageError
+import torch
 from ultralytics import YOLO
+
+# Keep torch to a single thread — on small/free-tier instances, letting
+# torch spin up multiple threads increases peak memory and CPU contention
+# without meaningfully speeding up single-image inference.
+torch.set_num_threads(1)
 
 # --------------------------------------------------------------------------
 # Configuration
@@ -29,6 +38,8 @@ MODEL_PATH = os.path.join(BASE_DIR, "best.pt")
 
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "bmp", "webp"}
 CONFIDENCE_THRESHOLD = 0.4
+INFERENCE_IMGSZ = 320  # smaller than the default 640 -> much lower peak RAM/CPU on small instances
+MAX_DETECTIONS = 20
 MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16 MB upload limit
 
 # Class names must match the order the model was trained with.
@@ -94,6 +105,10 @@ def run_inference(image_path: str, output_path: str):
     results = model.predict(
         source=image_path,
         conf=CONFIDENCE_THRESHOLD,
+        imgsz=INFERENCE_IMGSZ,
+        device="cpu",
+        half=False,
+        max_det=MAX_DETECTIONS,
         verbose=False,
     )
     print("[DEBUG] After prediction", flush=True)
