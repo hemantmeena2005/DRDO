@@ -3,3 +3,4 @@ ultralytics==8.2.103
 opencv-python-headless==4.10.0.84
 pillow==10.4.0
 werkzeug==3.0.4
+gunicorn==22.0.0
