@@ -11,6 +11,7 @@ requests for fast inference.
 import os
 import time
 import uuid
+import traceback
 
 from flask import Flask, request, jsonify, render_template, send_from_directory
 from werkzeug.utils import secure_filename
@@ -89,11 +90,13 @@ def run_inference(image_path: str, output_path: str):
     and return a list of detections plus the inference time in ms.
     """
     start_time = time.time()
+    print(f"[DEBUG] Before prediction: {image_path}", flush=True)
     results = model.predict(
         source=image_path,
         conf=CONFIDENCE_THRESHOLD,
         verbose=False,
     )
+    print("[DEBUG] After prediction", flush=True)
     inference_ms = round((time.time() - start_time) * 1000)
 
     result = results[0]
@@ -200,6 +203,8 @@ def predict():
     try:
         detections, inference_ms = run_inference(upload_path, output_path)
     except Exception as exc:  # noqa: BLE001
+        traceback.print_exc()
+        print(f"[ERROR] Prediction failed: {exc}", flush=True)
         return (
             jsonify({"success": False, "error": f"Prediction failed: {exc}"}),
             500,
@@ -248,4 +253,6 @@ def server_error(_error):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5003, debug=True)
+    debug_mode = os.environ.get("FLASK_DEBUG", "false").lower() == "true"
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=debug_mode)
